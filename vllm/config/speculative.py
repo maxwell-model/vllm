@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 
 import copy
 import functools
@@ -54,6 +55,7 @@ MTPModelTypes = Literal[
     "longcat_flash_mtp",
     "bailing_hybrid_v3_mtp",
     "minimax_m3_mtp",
+    "maxwell_v1_flash_mtp",
     "bailing_hybrid_mtp",
     "mtp",
     "kimi_k3_mtp",
@@ -1057,6 +1059,18 @@ class SpeculativeConfig:
             hf_config.update(
                 {"n_predict": n_predict, "architectures": ["MiniMaxM3MTP"]}
             )
+        if hf_config.model_type in ("maxwell_moe", "maxwell_v1_flash"):
+            hf_config.model_type = "maxwell_v1_flash_mtp"
+        if hf_config.model_type == "maxwell_v1_flash_mtp":
+            # The draft reads the trunk's pre-hc_head streams, so the
+            # speculator widens its hidden buffer by hc_mult.
+            hf_config.update(
+                {
+                    "n_predict": getattr(hf_config, "mtp_num_layers", 1),
+                    "architectures": ["MaxwellV1FlashMTP"],
+                    "hc_mult": hf_config.num_residual_streams,
+                }
+            )
         if hf_config.model_type == "glm5_next":
             hf_config.model_type = "glm5_next_mtp"
             n_predict = hf_config.num_nextn_predict_layers
@@ -1821,6 +1835,19 @@ class SpeculativeConfig:
             raise ValueError(
                 "Expected num_speculative_tokens to be greater "
                 f"than zero ({self.num_speculative_tokens})."
+            )
+
+        if (
+            self.method == "mtp"
+            and self.target_model_config is not None
+            and self.target_model_config.hf_config.model_type == "maxwell_moe"
+            and self.num_speculative_tokens != 1
+        ):
+            logger.warning(
+                "maxwell_moe currently only supports MTP with "
+                "num_speculative_tokens=1. Got num_speculative_tokens=%s; "
+                "please set num_speculative_tokens=1.",
+                self.num_speculative_tokens,
             )
 
         if self.rejection_sample_method == "synthetic":

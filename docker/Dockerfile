@@ -1,3 +1,4 @@
+# Modifications for Maxwell-V1-Flash integration.
 # The vLLM Dockerfile is used to construct vLLM image that can be directly used
 # to run the OpenAI compatible server.
 
@@ -207,6 +208,7 @@ ARG PYTORCH_NIGHTLY
 # Check whether to install torch nightly instead of release for this build
 COPY requirements/common.txt requirements/common.txt
 COPY requirements/cuda.txt requirements/cuda.txt
+COPY requirements/mbsa.txt requirements/mbsa.txt
 COPY tools/use_existing_torch.py tools/use_existing_torch.py
 COPY pyproject.toml pyproject.toml
 RUN --mount=type=cache,target=/opt/uv/cache \
@@ -249,7 +251,9 @@ RUN --mount=type=cache,target=/opt/uv/cache \
     else \
         uv pip install --python /opt/venv/bin/python3 -r requirements/cuda.txt \
         --extra-index-url ${PYTORCH_CUDA_INDEX_BASE_URL}/cu$(echo $CUDA_VERSION | cut -d. -f1,2 | tr -d '.'); \
-    fi
+    fi \
+    && uv pip install --python /opt/venv/bin/python3 --no-deps \
+        -r requirements/mbsa.txt
 
 # CUDA 13.4 Rubin images need a compatibility link for the prerelease
 # PyTorch wheel's libcurand.so.11 dependency. CUDA 13.5 must use its native
@@ -398,7 +402,7 @@ RUN --mount=type=cache,target=/opt/uv/cache \
 
 WORKDIR /workspace
 
-COPY pyproject.toml setup.py CMakeLists.txt ./
+COPY pyproject.toml setup.py CMakeLists.txt LICENSE NOTICE ./
 COPY tools/build_rust.py tools/build_rust.py
 COPY cmake cmake/
 COPY csrc csrc/
@@ -964,6 +968,7 @@ ENV VLLM_ENABLE_CUDA_COMPATIBILITY=0
 ARG PYTORCH_CUDA_INDEX_BASE_URL
 COPY requirements/common.txt /tmp/common.txt
 COPY requirements/cuda.txt /tmp/requirements-cuda.txt
+COPY requirements/mbsa.txt /tmp/requirements-mbsa.txt
 RUN --mount=type=cache,target=/opt/uv/cache \
     --mount=type=bind,source=requirements,target=/tmp/vllm-requirements,ro \
     if [ "${INSTALL_RUBIN_PRERELEASE}" = "true" ] && \
@@ -994,7 +999,8 @@ RUN --mount=type=cache,target=/opt/uv/cache \
             -r /tmp/requirements-cuda.txt \
             --extra-index-url ${PYTORCH_CUDA_INDEX_BASE_URL}/cu$(echo $CUDA_VERSION | cut -d. -f1,2 | tr -d '.'); \
     fi && \
-    rm /tmp/requirements-cuda.txt /tmp/common.txt
+    uv pip install --system --no-deps -r /tmp/requirements-mbsa.txt && \
+    rm /tmp/requirements-cuda.txt /tmp/requirements-mbsa.txt /tmp/common.txt
 
 # Install FlashInfer JIT cache (requires CUDA-version-specific index URL)
 # https://docs.flashinfer.ai/installation.html

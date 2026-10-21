@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 import torch
 from cutlass import (
     BFloat16,
@@ -18,6 +19,7 @@ from cutlass.cutlass_dsl import T, dsl_user_op
 
 _TORCH_TO_CUTE_DTYPE = {
     torch.bfloat16: BFloat16,
+    torch.float16: Float16,
     torch.float8_e4m3fn: Float8E4M3FN,
     torch.float32: Float32,
 }

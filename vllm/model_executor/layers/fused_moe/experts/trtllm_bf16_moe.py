@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 
 import torch
 
@@ -255,6 +256,9 @@ class TrtLlmBf16ExpertsMonolithic(TrtLlmBf16ExpertsBase, mk.FusedMoEExpertsMonol
             RoutingMethodType.RenormalizeNaive,
             RoutingMethodType.SigmoidRenorm,
             RoutingMethodType.Sigmoid,
+            # Sigmoid plus a score-correction bias, as the FP8 and NVFP4
+            # TRTLLM experts already accept.
+            RoutingMethodType.MiniMax2,
         ]
 
     def apply(

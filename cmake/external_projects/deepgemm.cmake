@@ -1,3 +1,4 @@
+# Modifications for Maxwell-V1-Flash integration.
 include(FetchContent)
 
 # If DEEPGEMM_SRC_DIR is set, DeepGEMM is built from that directory
@@ -28,12 +29,9 @@ if(DEEPGEMM_SRC_DIR)
   message(STATUS "DeepGEMM using local DEEPGEMM_SRC_DIR: ${deepgemm_SOURCE_DIR}")
 else()
   # Keep in sync with tools/install_deepgemm.sh
-  set(_DEEPGEMM_UPSTREAM_REPO "https://github.com/vllm-project/DeepGEMM.git")
-  # Pinned to the fork's dev branch: upstream 2.8.0 plus the SM120
-  # port, the SM90 paged-MQA kv_block=32/next_n=4 port, configurable SwiGLU
-  # alpha/beta, and SiTU for FP8/FP4 Mega MoE. Also includes the CUDA 12.x
-  # layout header fix from vllm-project/DeepGEMM#12.
-  set(_DEEPGEMM_UPSTREAM_TAG "e1f418c2a4f20818221f6b0e578b4c2f634d4c3f")
+  set(_DEEPGEMM_UPSTREAM_REPO "https://github.com/maxwell-model/DeepGEMM.git")
+  # Includes the eps_norm_out Mega mHC interface required by Maxwell-V1-Flash.
+  set(_DEEPGEMM_UPSTREAM_TAG "acc39c15353f46dec5ded3e78687d6ef897eea9d")
 
   set(_deepgemm_fc_root "${FETCHCONTENT_BASE_DIR}")
   if(NOT _deepgemm_fc_root)
@@ -173,6 +171,13 @@ if(DEEPGEMM_ARCHS)
   install(FILES
     "${deepgemm_SOURCE_DIR}/deep_gemm/__init__.py"
     DESTINATION vllm/third_party/deep_gemm
+    COMPONENT _deep_gemm_C)
+
+  install(FILES "${deepgemm_SOURCE_DIR}/LICENSE"
+    DESTINATION vllm/third_party/deep_gemm
+    COMPONENT _deep_gemm_C)
+  install(FILES "${deepgemm_SOURCE_DIR}/third-party/cutlass/LICENSE.txt"
+    DESTINATION vllm/third_party/deep_gemm/third_party/cutlass
     COMPONENT _deep_gemm_C)
 
   install(DIRECTORY "${deepgemm_SOURCE_DIR}/deep_gemm/utils/"

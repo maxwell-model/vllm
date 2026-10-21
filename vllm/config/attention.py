@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 
 from dataclasses import field
 from typing import Any, Literal
@@ -10,7 +11,7 @@ from vllm.config.utils import config
 from vllm.v1.attention.backends.mla.prefill.registry import MLAPrefillBackendEnum
 from vllm.v1.attention.backends.registry import AttentionBackendEnum
 
-IndexerKVDType = Literal["auto", "bf16", "fp8", "mxfp4", "nvfp4"]
+IndexerKVDType = Literal["auto", "bf16", "fp16", "fp8", "mxfp4", "mxfp6", "nvfp4"]
 MiniMaxM3MSADecodeBackend = Literal["triton", "cutlass"]
 
 
@@ -83,8 +84,8 @@ class AttentionConfig:
     indexer_kv_dtype: IndexerKVDType = "auto"
     """Data type for the sparse-attention indexer K cache. "auto" picks the
     model's default (bf16 for MiniMax M3, fp8 for the DeepSeek sparse
-    indexer). Quantized formats (fp8, mxfp4, nvfp4) require indexer kernel
-    support in the backend."""
+    indexer). Quantized formats (fp8, mxfp4, mxfp6, nvfp4) require indexer
+    kernel support in the backend."""
 
     indexer_sparse_logits: bool = False
     """DeepSeek V4.1 two-level indexer: score only the candidate blocks with

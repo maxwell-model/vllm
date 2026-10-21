@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 """Model configs may be defined in this directory for the following reasons:
 
 - There is no configuration file defined by HF Hub or Transformers library.
@@ -57,6 +58,8 @@ _CLASS_TO_MODULE: dict[str, str] = {
     "Lfm2MoeConfig": "vllm.transformers_utils.configs.lfm2_moe",
     "MedusaConfig": "vllm.transformers_utils.configs.medusa",
     "MiDashengLMConfig": "vllm.transformers_utils.configs.midashenglm",
+    "MaxwellMoeConfig": "vllm.transformers_utils.configs.maxwell_v1_flash",
+    "MaxwellV1FlashConfig": "vllm.transformers_utils.configs.maxwell_v1_flash",
     "MiniMaxM3Config": "vllm.transformers_utils.configs.minimax_m3",
     "MiniMaxM3MTPConfig": "vllm.transformers_utils.configs.minimax_m3",
     "MiniMaxM3TextConfig": "vllm.transformers_utils.configs.minimax_m3",
@@ -151,6 +154,8 @@ __all__ = [
     "Lfm2MoeConfig",
     "MedusaConfig",
     "MiDashengLMConfig",
+    "MaxwellMoeConfig",
+    "MaxwellV1FlashConfig",
     "MiniMaxM3Config",
     "MiniMaxM3MTPConfig",
     "MiniMaxM3TextConfig",

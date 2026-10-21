@@ -1,4 +1,5 @@
 #!/bin/sh
+# Modifications for Maxwell-V1-Flash integration.
 # Shell-level unit test for vllm-nonroot-entrypoint.sh.
 #
 # Runs on the host (no Docker, no GPU) by stubbing `vllm` with a shim that
@@ -21,6 +22,7 @@ if [ ! -x "$WRAPPER" ]; then
 fi
 
 WORKDIR="$(mktemp -d)"
+WORKDIR="$(cd "$WORKDIR" && pwd -P)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
 # Stub `vllm` on PATH. It dumps env + argv + cwd to stdout so we can assert.

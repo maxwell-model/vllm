@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 """Whenever you add an architecture to this page, please also update
 `tests/models/registry.py` with example HuggingFace models for it.
 """
@@ -159,6 +160,15 @@ _TEXT_GENERATION_MODELS = {
         "LongcatFlashNgramForCausalLM",
     ),
     "MambaForCausalLM": ("mamba", "MambaForCausalLM"),
+    "MaxwellV1FlashForCausalLM": (
+        "vllm.models.maxwell_v1_flash",
+        "MaxwellV1FlashForCausalLM",
+    ),
+    # The released checkpoint's name for the same model.
+    "MaxwellMoeForCausalLM": (
+        "vllm.models.maxwell_v1_flash",
+        "MaxwellV1FlashForCausalLM",
+    ),
     "Mamba2ForCausalLM": ("mamba2", "Mamba2ForCausalLM"),
     "MellumForCausalLM": ("mellum", "MellumForCausalLM"),
     "MiniCPMForCausalLM": ("minicpm", "MiniCPMForCausalLM"),
@@ -679,6 +689,7 @@ _SPECULATIVE_DECODING_MODELS = {
     "DeepSeekV4MTPModel": ("vllm.models.deepseek_v4", "DeepSeekV4MTP"),
     "BailingMoeV3MTPModel": ("bailing_moe_v3_mtp", "BailingMoeV3MTPModel"),
     "MiniMaxM3MTP": ("vllm.models.minimax_m3", "MiniMaxM3MTP"),
+    "MaxwellV1FlashMTP": ("vllm.models.maxwell_v1_flash", "MaxwellV1FlashMTP"),
     "BailingMoeV25MTPModel": ("bailing_moe_mtp", "BailingMoeV25MTPModel"),
     "InklingMTPModel": ("vllm.models.inkling", "InklingMTP"),
     "Gemma4MTPModel": ("gemma4_mtp", "Gemma4MTP"),

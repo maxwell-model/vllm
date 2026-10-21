@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 
 import ctypes
 import importlib.util
@@ -458,6 +459,15 @@ class cmake_build_ext(build_ext):
                 shutil.copytree(
                     fmha_sm100_build,
                     "vllm/third_party/fmha_sm100",
+                    dirs_exist_ok=True,
+                )
+
+            mbsa_build = os.path.join(self.build_lib, "vllm", "third_party", "mbsa")
+            if os.path.exists(mbsa_build):
+                print(f"Copying {mbsa_build} to vllm/third_party/mbsa")
+                shutil.copytree(
+                    mbsa_build,
+                    "vllm/third_party/mbsa",
                     dirs_exist_ok=True,
                 )
 
@@ -1055,6 +1065,7 @@ class precompiled_wheel_utils:
                 # DeepGEMM: extract all files (.py, .so, .cuh, .h, .hpp, etc.)
                 deep_gemm_regex = re.compile(r"vllm/third_party/deep_gemm/.*")
                 fmha_sm100_regex = re.compile(r"vllm/third_party/fmha_sm100/.*")
+                mbsa_regex = re.compile(r"vllm/third_party/mbsa/.*")
                 tml_fa4_regex = re.compile(r"vllm/third_party/tml_fa4/.*")
                 file_members = []
                 for member in wheel.filelist:
@@ -1083,6 +1094,7 @@ class precompiled_wheel_utils:
                         or deep_gemm_regex.match(member.filename)
                         or tml_fa4_regex.match(member.filename)
                         or fmha_sm100_regex.match(member.filename)
+                        or mbsa_regex.match(member.filename)
                     ):
                         file_members.append(member)
 
@@ -1417,6 +1429,8 @@ if _is_cuda():
         ext_modules.append(CMakeExtension(name="vllm._qutlass_C", optional=True))
     # fmha_sm100 is a Python/CuTe-DSL package installed into vllm.third_party.
     ext_modules.append(CMakeExtension(name="vllm.fmha_sm100", optional=True))
+    # MBSA is a Python/CuTe-DSL package installed into vllm.third_party.
+    ext_modules.append(CMakeExtension(name="vllm.mbsa", optional=True))
     # tml-fa4 is copied into an isolated vllm.third_party package.
     ext_modules.append(CMakeExtension(name="vllm.tml_fa4", optional=True))
 
@@ -1453,6 +1467,8 @@ package_data = {
         "third_party/deep_gemm/include/**/*.cuh",
         "third_party/deep_gemm/include/**/*.h",
         "third_party/deep_gemm/include/**/*.hpp",
+        "third_party/deep_gemm/LICENSE",
+        "third_party/deep_gemm/third_party/cutlass/LICENSE.txt",
         # fmha_sm100 sparse CuTe-DSL helper kernels (vendored via cmake)
         "third_party/fmha_sm100/csrc/**/*.cu",
         "third_party/fmha_sm100/csrc/**/*.h",
@@ -1463,6 +1479,18 @@ package_data = {
         "third_party/fmha_sm100/cutlass/include/**/*.hpp",
         "third_party/fmha_sm100/cutlass/tools/util/include/**/*.h",
         "third_party/fmha_sm100/cutlass/tools/util/include/**/*.hpp",
+        # MBSA extensions, JIT sources and third-party attribution.
+        "third_party/mbsa/**/mbsa_*.so",
+        "third_party/mbsa/cute/src/**/*.cu",
+        "third_party/mbsa/mxfp6/csrc/*.cu",
+        "third_party/mbsa/mxfp6/csrc/*.cuh",
+        "third_party/mbsa/LICENSE",
+        "third_party/mbsa/NOTICE",
+        "third_party/mbsa/third_party/**/LICENSE",
+        "third_party/mbsa/third_party/**/NOTICE",
+        "third_party/mbsa/third_party/**/AUTHORS",
+        "third_party/mbsa/third_party/**/*.md",
+        "third_party/mbsa/third_party/**/*.json",
     ]
 }
 

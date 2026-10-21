@@ -1,6 +1,9 @@
+# Modifications for Maxwell-V1-Flash integration.
 include LICENSE
+include NOTICE
 include requirements/common.txt
 include requirements/cuda.txt
+include requirements/mbsa.txt
 include requirements/rocm.txt
 include requirements/cpu.txt
 include CMakeLists.txt
