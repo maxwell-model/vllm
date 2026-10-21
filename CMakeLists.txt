@@ -1,3 +1,4 @@
+# Modifications for Maxwell-V1-Flash integration.
 cmake_minimum_required(VERSION 3.26)
 
 # When building directly using CMake, make sure you run the install step
@@ -1558,6 +1559,7 @@ if (VLLM_GPU_LANG STREQUAL "CUDA")
     include(cmake/external_projects/deepgemm.cmake)
     include(cmake/external_projects/deepselect.cmake)
     include(cmake/external_projects/fmha_sm100.cmake)
+    include(cmake/external_projects/mbsa.cmake)
     include(cmake/external_projects/flashmla.cmake)
     include(cmake/external_projects/flashkda.cmake)
     include(cmake/external_projects/qutlass.cmake)

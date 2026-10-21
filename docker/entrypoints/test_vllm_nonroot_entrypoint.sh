@@ -21,6 +21,7 @@ if [ ! -x "$WRAPPER" ]; then
 fi
 
 WORKDIR="$(mktemp -d)"
+WORKDIR="$(cd "$WORKDIR" && pwd -P)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
 # Stub `vllm` on PATH. It dumps env + argv + cwd to stdout so we can assert.

@@ -530,6 +530,11 @@ class Zamba2ModelArchConfigConvertor(ModelArchConfigConvertorBase):
         return getattr(self.hf_text_config, "attention_head_dim", 0)
 
 
+class MaxwellV1FlashModelArchConfigConvertor(ModelArchConfigConvertorBase):
+    def get_head_size(self) -> int:
+        return self.hf_text_config.attention_head_size
+
+
 class FalconModelArchConfigConvertor(ModelArchConfigConvertorBase):
     def get_total_num_kv_heads(self) -> int:
         # NOTE: for falcon, when new_decoder_architecture is True, the
@@ -827,6 +832,7 @@ MODEL_ARCH_CONFIG_CONVERTORS = {
     "glm_ocr_mtp": GLM4MoeMTPModelArchConfigConvertor,
     "longcat_flash_mtp": LongCatFlashMTPModelArchConfigConvertor,
     "mamba": MambaModelArchConfigConvertor,
+    "maxwell_v1_flash": MaxwellV1FlashModelArchConfigConvertor,
     "medusa": MedusaModelArchConfigConvertor,
     "mimo_mtp": MimoMTPModelArchConfigConvertor,
     "mimo_v2": MimoV2ModelArchConfigConvertor,

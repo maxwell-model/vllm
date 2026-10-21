@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 """Warmup kernels used during model execution.
 This is useful specifically for JIT'ed kernels as we don't want JIT'ing to
 happen during model execution.
@@ -156,6 +157,9 @@ def _autotune_kimi_k3_kda_qkvg(model: torch.nn.Module) -> None:
 
 
 def kernel_warmup(worker: "Worker", *, process_local_only: bool = False):
+    from vllm.model_executor.warmup.maxwell_v1_flash_warmup import (
+        maxwell_v1_flash_warmup,
+    )
     from vllm.model_executor.warmup.minimax_m3_msa_warmup import (
         minimax_m3_msa_warmup,
     )
@@ -235,6 +239,7 @@ def kernel_warmup(worker: "Worker", *, process_local_only: bool = False):
     b12x_warmup(worker, cudagraph_capture_sizes)
 
     minimax_m3_msa_warmup(worker)
+    maxwell_v1_flash_warmup(worker)
 
     # Allocate the exact decode-sized workspace, autotune cache misses, and
     # resolve every CUDA Graph bucket before capture begins.

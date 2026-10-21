@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+# Modifications for Maxwell-V1-Flash integration.
 from typing import TYPE_CHECKING
 
 from vllm.logger import init_logger
@@ -1016,6 +1017,25 @@ class LongcatFlashNgramForCausalLMConfig(VerifyAndUpdateConfig):
             compilation_config.cudagraph_mode = CUDAGraphMode.FULL
 
 
+class MaxwellV1FlashForCausalLMConfig(VerifyAndUpdateConfig):
+    @staticmethod
+    def verify_and_update_config(vllm_config: "VllmConfig") -> None:
+        # One sparse page is one KV block, so the block size is the page size.
+        cache_config = vllm_config.cache_config
+        page = getattr(
+            vllm_config.model_config.hf_config, "block_sparse_gqa_block_size", None
+        )
+        if page is None:
+            return
+        if not cache_config.user_specified_block_size:
+            cache_config.block_size = int(page)
+        elif cache_config.block_size != int(page):
+            raise ValueError(
+                f"this checkpoint uses {page}-token pages: --block-size must be "
+                f"{page} or left unset (got {cache_config.block_size})."
+            )
+
+
 MODELS_CONFIG_MAP: dict[str, type[VerifyAndUpdateConfig]] = {
     "ColBERTJinaRobertaModel": JinaRobertaModelConfig,
     "ColQwen3_5": ColQwen3_5Config,
@@ -1048,6 +1068,8 @@ MODELS_CONFIG_MAP: dict[str, type[VerifyAndUpdateConfig]] = {
     "LlamaNemotronVLModel": LlamaNemotronVLConfig,
     "Mamba2ForCausalLM": MambaModelConfig,
     "MambaForCausalLM": MambaModelConfig,
+    "MaxwellMoeForCausalLM": MaxwellV1FlashForCausalLMConfig,
+    "MaxwellV1FlashForCausalLM": MaxwellV1FlashForCausalLMConfig,
     "NemotronHForCausalLM": NemotronHForCausalLMConfig,
     "NemotronHPuzzleForCausalLM": NemotronHForCausalLMConfig,
     "NemotronH_Nano_VL_V2": NemotronHNanoVLV2Config,

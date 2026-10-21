@@ -1,0 +1,54 @@
+Maxwell-V1-Flash for vLLM
+Source attribution and integration notice
+
+Project licensing
+  This distribution is derived from vLLM and retains its Apache License 2.0;
+  see LICENSE. Maxwell-V1-Flash integration changes are distributed under
+  Apache License 2.0. Existing copyright, patent, trademark and attribution
+  notices remain applicable. Third-party components retain their own licenses.
+  Model weights and tokenizer assets are distributed separately and are not
+  licensed by this source-code notice.
+
+vLLM
+  https://github.com/vllm-project/vllm
+  Copyright contributors to the vLLM project.
+  This distribution retains the vLLM serving engine, APIs, model interfaces,
+  kernel infrastructure and original source attribution. Modified files carry
+  Maxwell-V1-Flash integration notices. Changes include model and configuration
+  registration, checkpoint loading, fused QKV/index projections, sparse
+  attention and index-cache formats, model-specific mHC normalization, router
+  GEMM, MTP drafting, model warmup and build/package integration.
+  Original SPDX license and copyright headers are retained.
+
+Maxwell Block Sparse Attention (MBSA)
+  https://github.com/maxwell-model/MBSA
+  Source revision: 07ebee24d561190437bae8740fabeea0f506d0b7.
+  CMake installs the Python package and builds its MXFP6 extensions under
+  vllm/third_party/mbsa. Maxwell-V1-Flash uses its serving interface, index
+  formats, cache writers and scorers. MBSA code uses Apache License 2.0;
+  its bundled components retain their original licenses and source notices.
+  The installed package retains MBSA's LICENSE and NOTICE, together with
+  component LICENSE, NOTICE, AUTHORS, PROVENANCE.md and UPSTREAM.json records.
+  Consult those records for MiniMax MSA, Fireworks, FlashAttention-4,
+  DeepGEMM and vLLM-derived sources.
+
+DeepGEMM
+  https://github.com/deepseek-ai/DeepGEMM
+  https://github.com/vllm-project/DeepGEMM
+  https://github.com/maxwell-model/DeepGEMM
+  Maxwell fork revision: acc39c15353f46dec5ded3e78687d6ef897eea9d.
+  This integration uses the Maxwell fork's Mega mHC eps_norm_out interface
+  for checkpoint-specific normalization. DeepGEMM and its bundled headers
+  retain their upstream licenses and copyright notices; DeepGEMM uses MIT.
+  Component notices are installed with vllm/third_party/deep_gemm.
+
+Split-BF16 router GEMM
+  vllm/models/maxwell_v1_flash/nvidia/ops/split_bf16_gemm.py records
+  https://github.com/Tencent/hpc-ops as an algorithm reference for splitting
+  FP32 router weights into BF16 high and residual terms. The integration
+  implements the router operation with Triton and FP32 accumulation.
+
+Other third-party components
+  Existing vLLM third-party source and runtime dependencies retain their
+  original licenses and copyright notices. This notice does not relicense
+  those components or replace any retained component notice.

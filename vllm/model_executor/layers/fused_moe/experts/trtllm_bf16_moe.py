@@ -255,6 +255,9 @@ class TrtLlmBf16ExpertsMonolithic(TrtLlmBf16ExpertsBase, mk.FusedMoEExpertsMonol
             RoutingMethodType.RenormalizeNaive,
             RoutingMethodType.SigmoidRenorm,
             RoutingMethodType.Sigmoid,
+            # Sigmoid plus a score-correction bias, as the FP8 and NVFP4
+            # TRTLLM experts already accept.
+            RoutingMethodType.MiniMax2,
         ]
 
     def apply(
